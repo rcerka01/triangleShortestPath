@@ -12,3 +12,4 @@ All not necessary whitespaces must be cleaned or it will throw the exception.
 
 - It seemed strange that requirements was to enter data from console, but datasets can be large. For large ones feed from file seams more appropriate.
 In this case the console and buffer memory must satisfy large data. My initial code had FS2 stream witch would handle large data from file very well, however, it seams like waste if data is fed from terminal.
+- Tagless Final is probably overkill here as well, but as match as requirements was to be a pure and functional, why not. As it is more representation of coding practice rather than best simplest solution.

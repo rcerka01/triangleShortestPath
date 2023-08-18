@@ -1,34 +1,25 @@
 import cats.effect._
-import fs2._
-import TriangleMinPath._
-
 import scala.io.StdIn
 
-object Main extends IOApp{
+object Main extends IOApp.Simple {
 
-  def readMultiLines(): List[String] = {
-    val line = StdIn.readLine()
-    if (line.isEmpty) Nil
-    else line :: readMultiLines()
-  }
-
-  override def run(args: List[String]): IO[ExitCode] = {
-    Stream
-      .eval(IO(readMultiLines()))
-      .flatMap(lines => Stream.emits(lines))
-      .compile
-      .toList
-      .flatMap { lines =>
-        parseTriangle(lines) match {
-          case Right(triangle) =>
-            val (path, sum) = minimalPath(triangle)
-            IO(println(path.mkString(" + ") + " = " + sum))
-
-          case Left(e) =>
-            IO(println("Error parsing triangle: " + e.getMessage))
-        }
+  private def readMultiLines(): IO[List[String]] = {
+    def loop(acc: List[String]): IO[List[String]] = {
+      IO(StdIn.readLine()).flatMap { line =>
+        if (line.isEmpty) IO.pure(acc.reverse)
+        else loop(line :: acc)
       }
-      .as(ExitCode.Success)
+    }
+    loop(Nil)
   }
 
+  override def run: IO[Unit] = {
+    for {
+      triangleService <- TriangleService.make[IO]()
+      lines           <- readMultiLines()
+      triangle        <- triangleService.parseTriangle(lines)
+      result          <- triangleService.minimalPath(triangle)
+      _ <- IO(println(result._1.mkString(" + ") + " = " + result._2))
+    } yield ()
+  }.handleErrorWith(error => IO(println(s"Error: ${error.getMessage}")))
 }

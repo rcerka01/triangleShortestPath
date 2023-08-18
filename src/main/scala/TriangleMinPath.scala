@@ -19,6 +19,12 @@ class TriangleServiceImpl[F[_]: Sync] extends TriangleService[F] {
       .pure[F]
   }
 
+  /**
+   * It would be more elegant solution just assemble path (List[Int]) and then just apply to it .sum.
+   * However, this solution have less complexity.
+   * @param triangle
+   * @return
+   */
   override def minimalPath(triangle: List[List[Int]]): F[(List[Int], Int)] = {
     val pathWithSum =
       triangle

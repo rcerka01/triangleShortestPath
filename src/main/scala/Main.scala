@@ -13,9 +13,14 @@ object Main extends IOApp.Simple {
     loop(Nil)
   }
 
+  /**
+   * Removed FS2, as it seams irrational if data read is going to be from console.
+   * @return
+   */
   override def run: IO[Unit] = {
     for {
       triangleService <- TriangleService.make[IO]()
+      _ <- IO(println("Enter triangle data:"))
       lines           <- readMultiLines()
       triangle        <- triangleService.parseTriangle(lines)
       result          <- triangleService.minimalPath(triangle)
